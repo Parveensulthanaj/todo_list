@@ -304,7 +304,7 @@ button:focus-visible {
 }
 ```
 ## OUTPUT
-![alt text](<Screenshot 2026-11-17 084255.png>)
+![alt text](todo/image1.png)
 
 ## RESULT
 The program for creating To-do list using JavaScript is executed successfully.
