@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>To-do list</title>
+  <link rel="stylesheet" href="todo.css">
+</head>
+<body>
+  <main class="board">
+    <h1>Today's tasks</h1>
+    <p id="count" class="count">No tasks yet</p>
+
+    <div class="add">
+      <input id="taskInput" type="text" placeholder="Add a task" aria-label="New task">
+      <button id="addBtn" type="button">Add task</button>
+    </div>
+
+    <ul id="taskList" class="tasks"></ul>
+
+    <div class="filters" role="group" aria-label="Filter tasks">
+      <button type="button" data-filter="all" class="active">All</button>
+      <button type="button" data-filter="open">Open</button>
+      <button type="button" data-filter="done">Done</button>
+    </div>
+  </main>
+
+  <script>
+    const input = document.getElementById("taskInput");
+    const list = document.getElementById("taskList");
+    const count = document.getElementById("count");
+    let tasks = [];
+    let filter = "all";
+
+    function render() {
+      list.innerHTML = "";
+      const shown = tasks.filter(t =>
+        filter === "all" || (filter === "done" ? t.done : !t.done));
+
+      if (shown.length === 0) {
+        const empty = document.createElement("li");
+        empty.className = "empty";
+        empty.textContent = "Nothing here. Type a task above and press Enter.";
+        list.appendChild(empty);
+      }
+
+      shown.forEach(t => {
+        const li = document.createElement("li");
+        li.className = "task" + (t.done ? " done" : "");
+
+        const box = document.createElement("input");
+        box.type = "checkbox";
+        box.checked = t.done;
+        box.setAttribute("aria-label", "Mark done: " + t.text);
+        box.onchange = () => { t.done = box.checked; render(); };
+
+        const label = document.createElement("span");
+        label.textContent = t.text;
+
+        const del = document.createElement("button");
+        del.type = "button";
+        del.className = "delete";
+        del.textContent = "Delete";
+        del.onclick = () => { tasks = tasks.filter(x => x !== t); render(); };
+
+        li.append(box, label, del);
+        list.appendChild(li);
+      });
+
+      const left = tasks.filter(t => !t.done).length;
+      count.textContent = tasks.length === 0
+        ? "No tasks yet"
+        : left + (left === 1 ? " task" : " tasks") + " left";
+    }
+
+    function addTask() {
+      const text = input.value.trim();
+      if (!text) return;
+      tasks.push({ text, done: false });
+      input.value = "";
+      render();
+    }
+
+    document.getElementById("addBtn").onclick = addTask;
+    input.addEventListener("keydown", e => { if (e.key === "Enter") addTask(); });
+
+    document.querySelectorAll(".filters button").forEach(b => {
+      b.onclick = () => {
+        filter = b.dataset.filter;
+        document.querySelectorAll(".filters button")
+          .forEach(x => x.classList.toggle("active", x === b));
+        render();
+      };
+    });
+
+    render();
+  </script>
+</body>
+</html>
